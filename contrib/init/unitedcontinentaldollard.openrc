@@ -1,0 +1,92 @@
+#!/sbin/openrc-run
+
+# backward compatibility for existing gentoo layout 
+#
+if [ -d "/var/lib/unitedcontinentaldollar/.unitedcontinentaldollar" ]; then
+	UNITEDCONTINENTALDOLLARD_DEFAULT_DATADIR="/var/lib/unitedcontinentaldollar/.unitedcontinentaldollar"
+else
+	UNITEDCONTINENTALDOLLARD_DEFAULT_DATADIR="/var/lib/unitedcontinentaldollard"
+fi
+
+UNITEDCONTINENTALDOLLARD_CONFIGFILE=${UNITEDCONTINENTALDOLLARD_CONFIGFILE:-/etc/unitedcontinentaldollar/unitedcontinentaldollar.conf}
+UNITEDCONTINENTALDOLLARD_PIDDIR=${UNITEDCONTINENTALDOLLARD_PIDDIR:-/var/run/unitedcontinentaldollard}
+UNITEDCONTINENTALDOLLARD_PIDFILE=${UNITEDCONTINENTALDOLLARD_PIDFILE:-${UNITEDCONTINENTALDOLLARD_PIDDIR}/unitedcontinentaldollard.pid}
+UNITEDCONTINENTALDOLLARD_DATADIR=${UNITEDCONTINENTALDOLLARD_DATADIR:-${UNITEDCONTINENTALDOLLARD_DEFAULT_DATADIR}}
+UNITEDCONTINENTALDOLLARD_USER=${UNITEDCONTINENTALDOLLARD_USER:-${UNITEDCONTINENTALDOLLAR_USER:-unitedcontinentaldollar}}
+UNITEDCONTINENTALDOLLARD_GROUP=${UNITEDCONTINENTALDOLLARD_GROUP:-unitedcontinentaldollar}
+UNITEDCONTINENTALDOLLARD_BIN=${UNITEDCONTINENTALDOLLARD_BIN:-/usr/bin/unitedcontinentaldollard}
+UNITEDCONTINENTALDOLLARD_NICE=${UNITEDCONTINENTALDOLLARD_NICE:-${NICELEVEL:-0}}
+UNITEDCONTINENTALDOLLARD_OPTS="${UNITEDCONTINENTALDOLLARD_OPTS:-${UNITEDCONTINENTALDOLLAR_OPTS}}"
+
+name="UnitedContinentalDollar Core Daemon"
+description="UnitedContinentalDollar cryptocurrency P2P network daemon"
+
+command="/usr/bin/unitedcontinentaldollard"
+command_args="-pid=\"${UNITEDCONTINENTALDOLLARD_PIDFILE}\" \
+		-conf=\"${UNITEDCONTINENTALDOLLARD_CONFIGFILE}\" \
+		-datadir=\"${UNITEDCONTINENTALDOLLARD_DATADIR}\" \
+		-daemon \
+		${UNITEDCONTINENTALDOLLARD_OPTS}"
+
+required_files="${UNITEDCONTINENTALDOLLARD_CONFIGFILE}"
+start_stop_daemon_args="-u ${UNITEDCONTINENTALDOLLARD_USER} \
+			-N ${UNITEDCONTINENTALDOLLARD_NICE} -w 2000"
+pidfile="${UNITEDCONTINENTALDOLLARD_PIDFILE}"
+
+# The retry schedule to use when stopping the daemon. Could be either
+# a timeout in seconds or multiple signal/timeout pairs (like
+# "SIGKILL/180 SIGTERM/300")
+retry="${UNITEDCONTINENTALDOLLARD_SIGTERM_TIMEOUT}"
+
+depend() {
+	need localmount net
+}
+
+# verify
+# 1) that the datadir exists and is writable (or create it)
+# 2) that a directory for the pid exists and is writable
+# 3) ownership and permissions on the config file
+start_pre() {
+	checkpath \
+	-d \
+	--mode 0750 \
+	--owner "${UNITEDCONTINENTALDOLLARD_USER}:${UNITEDCONTINENTALDOLLARD_GROUP}" \
+	"${UNITEDCONTINENTALDOLLARD_DATADIR}"
+
+	checkpath \
+	-d \
+	--mode 0755 \
+	--owner "${UNITEDCONTINENTALDOLLARD_USER}:${UNITEDCONTINENTALDOLLARD_GROUP}" \
+	"${UNITEDCONTINENTALDOLLARD_PIDDIR}"
+
+	checkpath -f \
+	-o ${UNITEDCONTINENTALDOLLARD_USER}:${UNITEDCONTINENTALDOLLARD_GROUP} \
+	-m 0660 \
+	${UNITEDCONTINENTALDOLLARD_CONFIGFILE}
+
+	checkconfig || return 1
+}
+
+checkconfig()
+{
+	if ! grep -qs '^rpcpassword=' "${UNITEDCONTINENTALDOLLARD_CONFIGFILE}" ; then
+		eerror ""
+		eerror "ERROR: You must set a secure rpcpassword to run unitedcontinentaldollard."
+		eerror "The setting must appear in ${UNITEDCONTINENTALDOLLARD_CONFIGFILE}"
+		eerror ""
+		eerror "This password is security critical to securing wallets "
+		eerror "and must not be the same as the rpcuser setting."
+		eerror "You can generate a suitable random password using the following "
+		eerror "command from the shell:"
+		eerror ""
+		eerror "bash -c 'tr -dc a-zA-Z0-9 < /dev/urandom | head -c32 && echo'"
+		eerror ""
+		eerror "It is recommended that you also set alertnotify so you are "
+		eerror "notified of problems:"
+		eerror ""
+		eerror "ie: alertnotify=echo %%s | mail -s \"UnitedContinentalDollar Alert\"" \
+			"admin@foo.com"
+		eerror ""
+		return 1
+	fi
+}

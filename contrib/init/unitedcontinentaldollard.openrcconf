@@ -1,0 +1,33 @@
+# /etc/conf.d/unitedcontinentaldollard: config file for /etc/init.d/unitedcontinentaldollard
+
+# Config file location
+#UNITEDCONTINENTALDOLLARD_CONFIGFILE="/etc/unitedcontinentaldollar/unitedcontinentaldollar.conf"
+
+# What directory to write pidfile to?  (created and owned by $UNITEDCONTINENTALDOLLARD_USER)
+#UNITEDCONTINENTALDOLLARD_PIDDIR="/var/run/unitedcontinentaldollard"
+
+# What filename to give the pidfile
+#UNITEDCONTINENTALDOLLARD_PIDFILE="${UNITEDCONTINENTALDOLLARD_PIDDIR}/unitedcontinentaldollard.pid"
+
+# Where to write unitedcontinentaldollard data (be mindful that the blockchain is large)
+#UNITEDCONTINENTALDOLLARD_DATADIR="/var/lib/unitedcontinentaldollard"
+
+# User and group to own unitedcontinentaldollard process
+#UNITEDCONTINENTALDOLLARD_USER="unitedcontinentaldollar"
+#UNITEDCONTINENTALDOLLARD_GROUP="unitedcontinentaldollar"
+
+# Path to unitedcontinentaldollard executable
+#UNITEDCONTINENTALDOLLARD_BIN="/usr/bin/unitedcontinentaldollard"
+
+# Nice value to run unitedcontinentaldollard under
+#UNITEDCONTINENTALDOLLARD_NICE=0
+
+# Additional options (avoid -conf and -datadir, use flags above)
+#UNITEDCONTINENTALDOLLARD_OPTS=""
+
+# The timeout in seconds OpenRC will wait for unitedcontinentaldollard to terminate
+# after a SIGTERM has been raised.
+# Note that this will be mapped as argument to start-stop-daemon's
+# '--retry' option, which means you can specify a retry schedule
+# here. For more information see man 8 start-stop-daemon.
+UNITEDCONTINENTALDOLLARD_SIGTERM_TIMEOUT=600

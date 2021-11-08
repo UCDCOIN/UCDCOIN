@@ -1,0 +1,7 @@
+[main]
+host = https://www.transifex.com
+
+[unitedcontinentaldollar.qt-translation-021x]
+file_filter = src/qt/locale/unitedcontinentaldollar_<lang>.ts
+source_file = src/qt/locale/unitedcontinentaldollar_en.ts
+source_lang = en
